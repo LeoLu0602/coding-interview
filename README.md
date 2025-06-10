@@ -35,7 +35,10 @@ coding-interview
 ### Front End
 
 ```
+# Install packages
 npm install
+
+# Run
 npm run dev
 ```
 
@@ -59,11 +62,19 @@ pip freeze > requirements.txt
 # Install packages
 pip install -r requirements.txt
 
-# Run Flask
+# Run
 python app.py
 ```
 
 ### Back End (WS)
+
+```
+# Install packages
+npm install
+
+# Run
+node app.js
+```
 
 ## Demo
 
