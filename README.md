@@ -3,7 +3,7 @@
 ## Table of Content
 
 -   [About](#about)
--   [Contribute](#contribute)
+-   [Setup](#setup)
 -   [Demo](#demo)
 -   [Credits](#credits)
 
@@ -14,7 +14,7 @@
 -   Front end: Next.js w/ TypeScript & Tailwind CSS
 -   Back end: Flask, Express.js, PostgreSQL
 
-## Contribute
+## Setup
 
 ### Project Structure
 
