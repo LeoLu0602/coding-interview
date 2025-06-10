@@ -17,7 +17,7 @@
 ## Contribute
 
 ```
-coding-interview:
+coding-interview
 ├─ client        
 ├─ server     
 └─ README.md
