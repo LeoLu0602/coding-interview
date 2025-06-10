@@ -34,6 +34,11 @@ coding-interview
 
 ### Front End
 
+```
+npm install
+npm run dev
+```
+
 ### Back End (HTTP)
 
 ```
