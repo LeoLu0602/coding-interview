@@ -12,15 +12,24 @@
 ### Tech Stack
 
 - Front end: Next.js w/ TypeScript & Tailwind CSS
-- Back end: Flask, PostgreSQL
+- Back end: Flask, Express.js, PostgreSQL
 
 ## Contribute
 
+### Project Structure
+
 ```
+only relevant directories/files are listed
+
 coding-interview
-├─ client        
-├─ server     
-└─ README.md
+├─client
+| ├─app
+| ├─components
+| └─lib
+├─server
+| ├─http
+| └─ws
+└─README.md
 ```
 
 ## Demo
