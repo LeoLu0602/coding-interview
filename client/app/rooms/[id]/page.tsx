@@ -1,11 +1,11 @@
 'use client';
 
 import { useState } from 'react';
-import { useParams } from 'next/navigation';
+// import { useParams } from 'next/navigation';
 import { Editor } from '@monaco-editor/react';
 
 export default function Room() {
-    const { id } = useParams();
+    // const { id } = useParams();
     const [code, setCode] = useState<string>(
         "print('Hello!')\nprint('My name is Elder Price.')"
     );
