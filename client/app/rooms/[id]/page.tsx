@@ -1,45 +1,52 @@
 'use client';
 
 import { useEffect, useRef } from 'react';
+import { useParams } from 'next/navigation';
 import { Editor } from '@monaco-editor/react';
 import type * as monaco from 'monaco-editor';
 import * as Y from 'yjs';
 import { WebsocketProvider } from 'y-websocket';
 
 export default function Room() {
-    const editorRef = useRef<monaco.editor.IStandaloneCodeEditor | null>(null);
-    const ydoc = useRef<Y.Doc | null>(null);
-    const provider = useRef<WebsocketProvider | null>(null);
-    const yText = useRef<Y.Text | null>(null);
+    const { id } = useParams<{ id: string }>();
+    const editorRef = useRef<monaco.editor.IStandaloneCodeEditor | null>(null); // Reference to the Monaco editor instance.
+    const ydoc = useRef<Y.Doc | null>(null); // Reference to the Yjs document representing the shared state.
+    const provider = useRef<WebsocketProvider | null>(null); // Reference to the Yjs websocket provider for syncing with server and peers.
+    const yText = useRef<Y.Text | null>(null); // Reference to the shared Yjs text type used for collaborative editing.
     const isApplyingRemoteChanges = useRef<boolean>(false);
 
     useEffect(() => {
-        ydoc.current = new Y.Doc();
+        ydoc.current = new Y.Doc(); // Create a new Yjs document for this client/session.
+
+        // Connect to the Yjs websocket server.
         provider.current = new WebsocketProvider(
             'wss://localhost:1234',
-            '1',
+            id,
             ydoc.current
         );
-        yText.current = ydoc.current.getText('monaco');
 
-        // Apply remote changes to Monaco.
+        yText.current = ydoc.current.getText('monaco'); // Create or access a shared collaborative text object called "monaco" inside the Yjs document.
+
+        // Listen for remote changes to the shared text and update Monaco editor accordingly.
         yText.current.observe((event) => {
             if (!editorRef.current) {
-                return;
+                return; // Editor not mounted yet.
             }
 
-            const selection = editorRef.current.getSelection();
+            const selection = editorRef.current.getSelection(); // Save current cursor/selection so we can restore it after updating content.
 
-            isApplyingRemoteChanges.current = true;
-            editorRef.current.setValue(yText.current?.toString() ?? '');
+            isApplyingRemoteChanges.current = true; // Indicate that remote changes are being applied to prevent local event feedback loops.
+            editorRef.current.setValue(yText.current?.toString() ?? ''); // Replace the entire content of Monaco editor with the latest shared text.
 
+            // Restore cursor/selection position if available.
             if (selection) {
                 editorRef.current.setSelection(selection);
             }
 
-            isApplyingRemoteChanges.current = false;
+            isApplyingRemoteChanges.current = false; // Done applying remote changes.
         });
 
+        // Cleanup: destroy the provider and Yjs document when component unmounts.
         return () => {
             provider.current?.destroy();
             ydoc.current?.destroy();
@@ -47,17 +54,20 @@ export default function Room() {
     }, []);
 
     function handleEditorDidMount(editor: monaco.editor.IStandaloneCodeEditor) {
-        editorRef.current = editor;
+        editorRef.current = editor; // Save editor instance reference.
         editor.setValue('');
 
+        // Listen to local editor content changes.
         editor.onDidChangeModelContent((event) => {
+            // Ignore changes that come from remote updates.
             if (isApplyingRemoteChanges.current) {
                 return;
             }
 
+            // For each change, update the shared Yjs text accordingly.
             event.changes.forEach((change) => {
-                yText.current?.delete(change.rangeOffset, change.rangeLength);
-                yText.current?.insert(change.rangeOffset, change.text);
+                yText.current?.delete(change.rangeOffset, change.rangeLength); // Delete the replaced text range in the shared document.
+                yText.current?.insert(change.rangeOffset, change.text); // Insert the new text in the shared document.
             });
         });
     }
@@ -72,9 +82,7 @@ export default function Room() {
                     defaultLanguage="python"
                     onMount={handleEditorDidMount}
                     options={{
-                        minimap: {
-                            enabled: false,
-                        },
+                        minimap: { enabled: false },
                     }}
                 />
             </div>
