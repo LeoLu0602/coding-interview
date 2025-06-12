@@ -29,7 +29,7 @@ export default function Room() {
         yText.current = ydoc.current.getText('monaco'); // Create or access a shared collaborative text object called "monaco" inside the Yjs document.
 
         // Listen for remote changes to the shared text and update Monaco editor accordingly.
-        yText.current.observe((event) => {
+        yText.current.observe(() => {
             if (!editorRef.current) {
                 return; // Editor not mounted yet.
             }
