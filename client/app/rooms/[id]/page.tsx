@@ -59,13 +59,6 @@ export default function Room() {
 
         // When editor mounts, check if yText has synced content.
         if (yText.current) {
-            if (yText.current.length === 0) {
-                yText.current?.insert(
-                    0,
-                    "print('Hello')\nprint('My name is Elder Price')"
-                );
-            }
-
             editor.setValue(yText.current.toString());
         }
 
