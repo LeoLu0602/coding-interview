@@ -16,7 +16,7 @@ export default function Room() {
 
     return (
         <>
-            <div className="fixed right-0 top-0 w-1/2 h-screen bg-[#1e1e1e] pt-10">
+            <div className="fixed right-0 top-0 w-[600px] h-screen bg-[#1e1e1e] pt-10">
                 <Editor
                     theme="vs-dark"
                     width="100%"
