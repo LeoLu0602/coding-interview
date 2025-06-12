@@ -20,7 +20,7 @@ export default function Room() {
 
         // Connect to the Yjs websocket server.
         provider.current = new WebsocketProvider(
-            'wss://localhost:1234',
+            'ws://localhost:1234',
             id,
             ydoc.current
         );
@@ -55,7 +55,11 @@ export default function Room() {
 
     function handleEditorDidMount(editor: monaco.editor.IStandaloneCodeEditor) {
         editorRef.current = editor; // Save editor instance reference.
-        editor.setValue('');
+
+        // When editor mounts, check if yText has synced content.
+        if (yText.current) {
+            editor.setValue(yText.current.toString());
+        }
 
         // Listen to local editor content changes.
         editor.onDidChangeModelContent((event) => {
