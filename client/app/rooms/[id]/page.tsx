@@ -19,6 +19,7 @@ export default function Room() {
         ydoc.current = new Y.Doc(); // Create a new Yjs document for this client/session.
 
         // Connect to the Yjs websocket server.
+        // npx y-websocket-server --port 1234
         provider.current = new WebsocketProvider(
             'ws://localhost:1234',
             id,
@@ -58,6 +59,13 @@ export default function Room() {
 
         // When editor mounts, check if yText has synced content.
         if (yText.current) {
+            if (yText.current.length === 0) {
+                yText.current?.insert(
+                    0,
+                    "print('Hello')\nprint('My name is Elder Price')"
+                );
+            }
+
             editor.setValue(yText.current.toString());
         }
 
