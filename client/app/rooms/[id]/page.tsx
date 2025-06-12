@@ -1,17 +1,65 @@
 'use client';
 
-import { useState } from 'react';
-// import { useParams } from 'next/navigation';
+import { useEffect, useRef } from 'react';
 import { Editor } from '@monaco-editor/react';
+import type * as monaco from 'monaco-editor';
+import * as Y from 'yjs';
+import { WebsocketProvider } from 'y-websocket';
 
 export default function Room() {
-    // const { id } = useParams();
-    const [code, setCode] = useState<string>(
-        "print('Hello!')\nprint('My name is Elder Price.')"
-    );
+    const editorRef = useRef<monaco.editor.IStandaloneCodeEditor | null>(null);
+    const ydoc = useRef<Y.Doc | null>(null);
+    const provider = useRef<WebsocketProvider | null>(null);
+    const yText = useRef<Y.Text | null>(null);
+    const isApplyingRemoteChanges = useRef<boolean>(false);
 
-    function handleCodeChange(value: string | undefined) {
-        setCode(value ?? '');
+    useEffect(() => {
+        ydoc.current = new Y.Doc();
+        provider.current = new WebsocketProvider(
+            'wss://localhost:1234',
+            '1',
+            ydoc.current
+        );
+        yText.current = ydoc.current.getText('monaco');
+
+        // Apply remote changes to Monaco.
+        yText.current.observe((event) => {
+            if (!editorRef.current) {
+                return;
+            }
+
+            const selection = editorRef.current.getSelection();
+
+            isApplyingRemoteChanges.current = true;
+            editorRef.current.setValue(yText.current?.toString() ?? '');
+
+            if (selection) {
+                editorRef.current.setSelection(selection);
+            }
+
+            isApplyingRemoteChanges.current = false;
+        });
+
+        return () => {
+            provider.current?.destroy();
+            ydoc.current?.destroy();
+        };
+    }, []);
+
+    function handleEditorDidMount(editor: monaco.editor.IStandaloneCodeEditor) {
+        editorRef.current = editor;
+        editor.setValue('');
+
+        editor.onDidChangeModelContent((event) => {
+            if (isApplyingRemoteChanges.current) {
+                return;
+            }
+
+            event.changes.forEach((change) => {
+                yText.current?.delete(change.rangeOffset, change.rangeLength);
+                yText.current?.insert(change.rangeOffset, change.text);
+            });
+        });
     }
 
     return (
@@ -22,8 +70,7 @@ export default function Room() {
                     width="100%"
                     height="100%"
                     defaultLanguage="python"
-                    value={code}
-                    onChange={handleCodeChange}
+                    onMount={handleEditorDidMount}
                     options={{
                         minimap: {
                             enabled: false,
