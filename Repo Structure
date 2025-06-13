@@ -1,0 +1,24 @@
+code-interview-platform/
+├── client/                  # Frontend (React)
+│   ├── public/
+│   ├── src/
+│   │   ├── components/      # Reusable UI components
+│   │   ├── pages/           # Pages like Lobby, Session
+│   │   ├── App.jsx
+│   │   └── main.jsx
+│   ├── package.json
+│   └── vite.config.js       # or CRA config
+│
+├── server/                  # Backend (Node.js)
+│   ├── routes/              # REST API routes (e.g., match, session)
+│   ├── controllers/         # Logic for routes
+│   ├── app.js               # Main server file
+│   ├── package.json
+│   └── README.md
+│
+├── shared/                 # (Optional) Shared constants/models
+│   └── questions.js         # LeetCode-style questions
+│
+├── README.md               # Overview of the project
+├── .gitignore
+└── LICENSE
