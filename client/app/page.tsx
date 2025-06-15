@@ -1,8 +1,46 @@
+'use client';
+
+import { useEffect, useRef } from 'react';
+
 export default function Home() {
+    const ws = useRef<WebSocket | null>(null);
+
+    useEffect(() => {
+        ws.current = new WebSocket('ws://localhost:1337');
+
+        ws.current.onopen = () => {
+            console.log('connected to WebSocket server');
+        };
+
+        ws.current.onmessage = (event: MessageEvent) => {
+            console.log('received:', event.data);
+        };
+
+        ws.current.onclose = () => {
+            console.log('disconnected');
+        };
+
+        return () => {
+            ws.current?.close();
+        };
+    }, []);
+
+    function findInterviewBuddy() {
+        if (ws.current && ws.current.readyState === WebSocket.OPEN) {
+            ws.current.send('Hello from React button!');
+            console.log('Message sent');
+        } else {
+            console.log('WebSocket not connected');
+        }
+    }
+
     return (
         <>
             <main className="fixed left-0 top-0 w-full h-screen flex flex-col justify-center items-center">
-                <button className="bg-emerald-500 p-4 font-bold text-white rounded-xl hover:bg-emerald-600">
+                <button
+                    className="bg-emerald-500 p-4 font-bold text-white rounded-xl hover:bg-emerald-600"
+                    onClick={findInterviewBuddy}
+                >
                     Find Your Interview Buddy!
                 </button>
             </main>
