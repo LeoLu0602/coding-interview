@@ -1,11 +1,13 @@
 'use client';
 
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
+import clsx from 'clsx';
 
 export default function Home() {
     const ws = useRef<WebSocket | null>(null);
     const router = useRouter();
+    const [isFinding, setIsFinding] = useState(false);
 
     useEffect(() => {
         ws.current = new WebSocket('ws://localhost:1337');
@@ -23,6 +25,7 @@ export default function Home() {
             switch (type) {
                 case 'matchResponse':
                     console.log(`roomId: ${roomId}`);
+                    setIsFinding(false);
                     router.push(`/rooms/${roomId}`);
 
                     break;
@@ -45,6 +48,8 @@ export default function Home() {
             return;
         }
 
+        setIsFinding(true);
+
         ws.current.send(
             JSON.stringify({
                 type: 'matchRequest',
@@ -59,10 +64,17 @@ export default function Home() {
         <>
             <main className="fixed left-0 top-0 w-full h-screen flex flex-col justify-center items-center">
                 <button
-                    className="bg-emerald-500 p-4 font-bold text-white rounded-xl hover:bg-emerald-600"
+                    className={clsx(
+                        'bg-emerald-500 p-4 font-bold text-white rounded-xl',
+                        {
+                            'hover:bg-emerald-600 cursor-pointer': !isFinding,
+                            'cursor-not-allowed': isFinding,
+                        }
+                    )}
                     onClick={findInterviewBuddy}
+                    disabled={isFinding}
                 >
-                    Find Your Interview Buddy!
+                    {isFinding ? 'Searching...' : 'Find Your Interview Buddy!'}
                 </button>
             </main>
         </>
