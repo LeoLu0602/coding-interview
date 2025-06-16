@@ -1,9 +1,11 @@
 'use client';
 
 import { useEffect, useRef } from 'react';
+import { useRouter } from 'next/navigation';
 
 export default function Home() {
     const ws = useRef<WebSocket | null>(null);
+    const router = useRouter();
 
     useEffect(() => {
         ws.current = new WebSocket('ws://localhost:1337');
@@ -21,6 +23,7 @@ export default function Home() {
             switch (type) {
                 case 'matchResponse':
                     console.log(`roomId: ${roomId}`);
+                    router.push(`/rooms/${roomId}`);
 
                     break;
                 default:
