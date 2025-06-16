@@ -19,7 +19,6 @@ export default function Room() {
         ydoc.current = new Y.Doc(); // Create a new Yjs document for this client/session.
 
         // Connect to the Yjs websocket server.
-        // npx y-websocket-server --port 1234
         provider.current = new WebsocketProvider(
             'ws://localhost:1234',
             id,

@@ -14,6 +14,18 @@ export default function Home() {
 
         ws.current.onmessage = (event: MessageEvent) => {
             console.log('received:', event.data);
+
+            const { type, payload } = JSON.parse(event.data);
+            const { roomId } = payload;
+
+            switch (type) {
+                case 'matchResponse':
+                    console.log(`roomId: ${roomId}`);
+
+                    break;
+                default:
+                    break;
+            }
         };
 
         ws.current.onclose = () => {
@@ -26,12 +38,18 @@ export default function Home() {
     }, []);
 
     function findInterviewBuddy() {
-        if (ws.current && ws.current.readyState === WebSocket.OPEN) {
-            ws.current.send('Hello from React button!');
-            console.log('Message sent');
-        } else {
-            console.log('WebSocket not connected');
+        if (!ws.current || ws.current.readyState !== WebSocket.OPEN) {
+            return;
         }
+
+        ws.current.send(
+            JSON.stringify({
+                type: 'matchRequest',
+                payload: {
+                    userId: null,
+                },
+            })
+        );
     }
 
     return (
