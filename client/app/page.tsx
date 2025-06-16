@@ -24,7 +24,6 @@ export default function Home() {
 
             switch (type) {
                 case 'matchResponse':
-                    console.log(`roomId: ${roomId}`);
                     setIsFinding(false);
                     router.push(`/rooms/${roomId}`);
 
