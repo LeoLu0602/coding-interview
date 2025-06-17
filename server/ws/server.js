@@ -3,7 +3,6 @@ import { v4 } from 'uuid';
 
 const PORT = 1337;
 const wss = new WebSocketServer({ port: PORT });
-const rooms = new Map();
 let waiting = null;
 
 wss.on('connection', (ws) => {
@@ -12,25 +11,12 @@ wss.on('connection', (ws) => {
     ws.on('message', (msg) => {
         console.log(`received: ${msg}`);
 
-        const { type, payload } = JSON.parse(msg);
-        const { userId } = payload;
+        const { type } = JSON.parse(msg);
 
         switch (type) {
             case 'matchRequest':
                 if (waiting) {
                     const roomId = v4();
-
-                    rooms.set(roomId, [
-                        waiting,
-                        {
-                            ws,
-                            userId,
-                        },
-                    ]);
-
-                    waiting = null;
-                    console.log(rooms, waiting);
-
                     const resStr = JSON.stringify({
                         type: 'matchResponse',
                         payload: {
@@ -38,14 +24,18 @@ wss.on('connection', (ws) => {
                         },
                     });
 
-                    rooms.get(roomId)[0].ws.send(resStr);
-                    rooms.get(roomId)[1].ws.send(resStr);
+                    waiting.send(resStr);
+                    ws.send(resStr);
+                    waiting = null;
+                    console.log(`waiting: ${waiting}`);
                 } else {
-                    waiting = {
-                        ws,
-                        userId,
-                    };
+                    waiting = ws;
                     console.log('a user is waiting...');
+
+                    waiting.on('close', () => {
+                        waiting = null;
+                        console.log(`waiting: ${waiting}`);
+                    });
                 }
 
                 break;
