@@ -11,8 +11,7 @@ wss.on('connection', (ws) => {
     ws.on('message', (msg) => {
         console.log(`received: ${msg}`);
 
-        const { type, payload } = JSON.parse(msg);
-        const { userId } = payload;
+        const { type } = JSON.parse(msg);
 
         switch (type) {
             case 'matchRequest':
@@ -28,10 +27,15 @@ wss.on('connection', (ws) => {
                     waiting.send(resStr);
                     ws.send(resStr);
                     waiting = null;
-                    console.log(waiting);
+                    console.log(`waiting: ${waiting}`);
                 } else {
                     waiting = ws;
                     console.log('a user is waiting...');
+
+                    waiting.on('close', () => {
+                        waiting = null;
+                        console.log(`waiting: ${waiting}`);
+                    });
                 }
 
                 break;
